@@ -65,6 +65,8 @@ def build_parser():
     sub["search"].add_argument("--limit", type=int, default=20)
     sub["resume"].add_argument("--budget", type=int, default=1600)
     sub["forget"].add_argument("id")
+    commands.add_parser("doctor", help="Check local runtime prerequisites")
+    commands.add_parser("demo", help="Try a synthetic handoff in an isolated temporary database")
     commands.add_parser("scopes", help="List projects, tasks and branches")
     for name in ("export", "import"):
         commands.add_parser(name, help=f"{name.title()} a portable JSON snapshot").add_argument("file", type=Path)
@@ -148,6 +150,21 @@ def main(argv=None):
                 print(result, end="")
             else:
                 print_json(result)
+            return 0
+        if args.command == "doctor":
+            with sqlite3.connect(":memory:") as conn:
+                conn.execute("CREATE VIRTUAL TABLE probe USING fts5(text)")
+            print_json({"python": sys.version.split()[0], "sqlite": sqlite3.sqlite_version, "fts5": True, "version": VERSION, "note": "Runtime check only; agent connectivity is not verified."})
+            return 0
+        if args.command == "demo":
+            from tempfile import TemporaryDirectory
+
+            with TemporaryDirectory(prefix="satubrain-demo-") as directory:
+                demo = Store(Path(directory) / "demo.sqlite3")
+                scope = {"project": "synthetic-demo", "task": "DEMO-17", "branch": "main"}
+                demo.save(**scope, agent="claude", kind="decision", text="Keep imports transactional.")
+                demo.save(**scope, agent="claude", kind="handoff", text="Import tests passed. Next: verify cancellation.")
+                print_json(demo.context(*scope.values(), "import", 1200))
             return 0
         store = Store(args.db or default_db())
         if args.command in ACTIONS:
