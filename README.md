@@ -6,6 +6,18 @@ SatuBrain gives Claude Code, Codex, GitHub Copilot and Cursor a shared, searchab
 
 ![SatuBrain terminal demo showing handoff, resume and scoped search](docs/demo.gif)
 
+## Try it in 60 seconds
+
+No AI account or API key is needed for the synthetic demo. With Python 3.11+ and pipx installed:
+
+```sh
+pipx install git+https://github.com/amnansyahmi/satubrain.git
+satubrain doctor
+satubrain demo
+```
+
+The demo uses a temporary database, not your real workspace or memory. The doctor checks runtime prerequisites, not live agent connectivity.
+
 ## Quick start
 
 Requires Python 3.11+ with SQLite FTS5. Install from a checkout with `python -m pip install .`, then run these commands in your Git project.
@@ -36,5 +48,11 @@ The core uses local SQLite and has zero third-party runtime dependencies. Exampl
 - [History, import/export and encrypted sync](docs/data.md)
 - [Security and trust model](SECURITY.md)
 - [Verification and benchmarks](docs/verification.md)
+
+## Community
+
+[Contribute](CONTRIBUTING.md) · [Troubleshooting](docs/TROUBLESHOOTING.md) · [Roadmap](docs/ROADMAP.md)
+
+SatuBrain is currently a release candidate. If it helps you switch coding agents without losing context, consider starring the repository. Feedback and reproducible bug reports are welcome.
 
 MIT licensed.
