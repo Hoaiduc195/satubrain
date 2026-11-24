@@ -152,8 +152,14 @@ def main(argv=None):
                 print_json(result)
             return 0
         if args.command == "doctor":
-            with sqlite3.connect(":memory:") as conn:
-                conn.execute("CREATE VIRTUAL TABLE probe USING fts5(text)")
+            try:
+                with sqlite3.connect(":memory:") as conn:
+                    conn.execute("CREATE VIRTUAL TABLE probe USING fts5(text)")
+            except sqlite3.OperationalError:
+                raise ValueError(
+                    "SQLite FTS5 extension is unavailable in this Python build; "
+                    "install Python 3.11+ with FTS5 enabled and rerun 'satubrain doctor'"
+                ) from None
             print_json({"python": sys.version.split()[0], "sqlite": sqlite3.sqlite_version, "fts5": True, "version": VERSION, "note": "Runtime check only; agent connectivity is not verified."})
             return 0
         if args.command == "demo":
@@ -174,11 +180,20 @@ def main(argv=None):
         elif args.command == "export":
             destination = args.file.expanduser()
             if destination.resolve() == store.path.resolve() or destination.exists():
-                raise ValueError("export requires a new file")
+                raise ValueError(
+                    "export requires a new file path that does not already exist or point to the active database"
+                )
             atomic_write(destination, json_bytes(store.export()) + b"\n", overwrite=False)
             result = {"file": str(destination)}
         elif args.command == "import":
-            result = store.merge(json.loads(read_limited(args.file.expanduser(), MAX_SNAPSHOT)))
+            source = args.file.expanduser()
+            try:
+                payload = json.loads(read_limited(source, MAX_SNAPSHOT))
+            except FileNotFoundError:
+                raise ValueError(f"snapshot file not found: {source} (check the path and try again)") from None
+            except json.JSONDecodeError:
+                raise ValueError("invalid JSON in snapshot file (expected output from 'satubrain export')") from None
+            result = store.merge(payload)
         elif args.command == "sync":
             password = os.environ.get("SATUBRAIN_SYNC_PASSPHRASE")
             if password is None:
@@ -186,7 +201,13 @@ def main(argv=None):
                     raise ValueError("set SATUBRAIN_SYNC_PASSPHRASE when running without a terminal")
                 password = getpass.getpass("Sync passphrase: ")
             operation = push if args.direction == "push" else pull
-            result = operation(store, args.folder, password)
+            try:
+                result = operation(store, args.folder, password)
+            except ImportError:
+                raise ValueError(
+                    "encrypted sync requires the optional sync dependency; "
+                    "install it with 'python -m pip install \"satubrain[sync]\"'"
+                ) from None
         elif args.command == "hook":
             run_hook(args.token, store)
             return 0
@@ -205,5 +226,9 @@ def main(argv=None):
     except KeyboardInterrupt:
         return 130
     except (ValueError, OSError, sqlite3.Error, RecursionError) as error:
-        print(f"satubrain: {error}", file=sys.stderr)
+        message = str(error)
+        passphrase = os.environ.get("SATUBRAIN_SYNC_PASSPHRASE")
+        if passphrase and passphrase in message:
+            message = message.replace(passphrase, "[redacted]")
+        print(f"satubrain: {message}", file=sys.stderr)
         return 1
