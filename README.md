@@ -49,4 +49,10 @@ The core uses local SQLite and has zero third-party runtime dependencies. Exampl
 - [Security and trust model](SECURITY.md)
 - [Verification and benchmarks](docs/verification.md)
 
+## Community
+
+[Contribute](CONTRIBUTING.md) · [Troubleshooting](docs/TROUBLESHOOTING.md) · [Roadmap](docs/ROADMAP.md)
+
+SatuBrain is currently a release candidate. If it helps you switch coding agents without losing context, consider starring the repository. Feedback and reproducible bug reports are welcome.
+
 MIT licensed.
