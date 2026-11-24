@@ -23,7 +23,7 @@ satubrain doctor
 **Expected error when FTS5 is missing:**
 
 ```text
-satubrain: no such module: fts5
+satubrain: SQLite FTS5 extension is unavailable in this Python build; install Python 3.11+ with FTS5 enabled and rerun 'satubrain doctor'
 ```
 
 (Exit code `1`.)
