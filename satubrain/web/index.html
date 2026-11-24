@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SatuBrain · Memory dashboard</title>
+  <link rel="stylesheet" href="/style.css">
+  <script defer src="/app.js"></script>
+</head>
+<body>
+  <header class="masthead">
+    <div class="brand"><span class="mark" aria-hidden="true">S</span><span>SatuBrain</span></div>
+    <div class="status"><span></span> Local SQLite</div>
+  </header>
+  <div class="layout">
+    <aside class="sidebar">
+      <p class="label">Workspace</p>
+      <div class="project" id="project">Loading…</div>
+      <div class="branch" id="branch"></div>
+      <div class="tasks-title"><h2>Tasks</h2><button class="small" id="new-task" type="button">+ New task</button></div>
+      <nav aria-label="Tasks" id="scopes"></nav>
+    </aside>
+    <main>
+      <div class="heading">
+        <div><p class="label">Memory dashboard</p><h1 id="title">Task memory</h1><p class="subtitle" id="subtitle">Loading local memory…</p></div>
+        <button class="primary" id="add" type="button">+ Add memory</button>
+      </div>
+      <form class="filters" id="filters" role="search">
+        <label class="search-field"><span aria-hidden="true">⌕</span><input id="query" type="search" aria-label="Search task memory" placeholder="Search task memory…" maxlength="400"></label>
+        <label class="select-field"><span class="sr-only">Memory type</span><select id="kind"><option value="">All types</option><option value="note">Notes</option><option value="decision">Decisions</option><option value="handoff">Handoffs</option><option value="message">Messages</option></select></label>
+      </form>
+      <p class="notice" id="notice" role="status"></p>
+      <section aria-label="Memories" id="memories"></section>
+    </main>
+  </div>
+  <dialog id="editor">
+    <form id="capture">
+      <div class="dialog-heading"><h2 id="editor-title">Add memory</h2><button class="icon" type="button" data-close="editor" aria-label="Close">×</button></div>
+      <label>Task <input id="entry-task" required maxlength="240"></label>
+      <label>Type <select id="entry-kind"><option value="note">Note</option><option value="decision">Decision</option><option value="handoff">Handoff</option></select></label>
+      <label>Memory <textarea id="entry-text" required rows="6" maxlength="24000" placeholder="What should the next session know?"></textarea></label>
+      <p class="notice" id="editor-notice" role="status"></p>
+      <button class="primary" id="save" type="submit">Save memory</button>
+    </form>
+  </dialog>
+  <dialog id="details">
+    <div class="dialog-heading"><h2 id="detail-title">Memory</h2><button class="icon" type="button" data-close="details" aria-label="Close">×</button></div>
+    <p class="subtitle" id="detail-meta"></p>
+    <pre id="detail-text"></pre>
+    <button class="danger" id="forget" type="button">Delete memory</button>
+    <p class="notice" id="detail-notice" role="status"></p>
+  </dialog>
+</body>
+</html>
