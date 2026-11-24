@@ -111,7 +111,13 @@ satubrain demo
 
 ### Windows PowerShell `PATH` & execution policy troubleshooting
 
-- If script activation fails with `running scripts is disabled on this system`, allow local signed/user scripts in the current user scope:
+- If script activation fails with `running scripts is disabled on this system`, you do **not** have to change your execution policy — invoke the virtual environment executables directly instead:
+  ```powershell
+  .\.venv\Scripts\python.exe -m pip install .
+  .\.venv\Scripts\satubrain.exe doctor
+  .\.venv\Scripts\satubrain.exe demo
+  ```
+- Alternatively, if you prefer activating `.venv`, allow local signed/user scripts in the current user scope:
   ```powershell
   Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
   ```
